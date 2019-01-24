@@ -36,29 +36,28 @@ class BananaEnv:
         """Create a generator for and episode driven by an actor.
         Args:
             actor: An actor that provides the next action for a given state.
-            max_steps: Maximum number of steps to take in the episode. If None,
-                the episode is generated until a terminal state is reached.
+            max_steps: Maximum number of steps (int) to take in the episode. If
+                None, the episode is generated until a terminal state is reached.
 
         Returns:
-            A generator providing a tuple of the step count and step data, where
-            the step data is a tuple containing the current state, current action,
-            reward, the next state and a flag whether the next state is terminal.
+            A generator providing a tuple of the current state, the action taken,
+            the obtained reward, the next state and a flag whether the next
+            state is terminal or not.
         """
-        count = -1
         state = self.reset()
         is_terminal = False
+        count = 0
 
         while not is_terminal and (max_steps is None or count < max_steps):
-            count += 1
-
             action = agent.act(state)
             reward, next_state, is_terminal = self.step(action)
 
             step_data = (state, action, reward, next_state, is_terminal)
 
             state = next_state
+            count += 1
 
-            yield count, step_data
+            yield step_data
 
     def reset(self, train_mode=False):
         """Reset and initiate a new episode in the environment.
@@ -179,7 +178,7 @@ if __name__ == '__main__':
     print("\n\n\nRun episode:")
     rand_Q = lambda s: np.random.rand(4)
     agent = BananaAgent(rand_Q, 4)
-    episode = env.generate_episode(agent, max_steps=5)
+    episode = enumerate(env.generate_episode(agent, max_steps=5))
     for count, step_data in episode:
         print("\n\nCount:")
         pprint(count)
