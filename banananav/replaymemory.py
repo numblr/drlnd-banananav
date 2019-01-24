@@ -4,7 +4,7 @@ from banananav.environment import BananaEnv
 
 
 class ReplayMemory():
-    def __init__(self, size, seed):
+    def __init__(self, size, seed=0):
         # TODO seed
         self._buffer = [None] * size
         self._pos = 0

@@ -20,7 +20,7 @@ class TestReplayMemory(unittest.TestCase):
         self.memory.add((11,21), 1, 1, (31,41), False)
         self.memory.add((12,22), 2, 2, (32,42), False)
 
-        self.assertEquals(self.memory.size(), 2)
+        self.assertEqual(self.memory.size(), 2)
 
         _, actions, _, _, _ = zip(*self.memory.sample(2))
         self.assertEqual(len(actions), 2)
@@ -32,7 +32,7 @@ class TestReplayMemory(unittest.TestCase):
         self.memory.add((12,22), 2, 2, (32,42), False)
         self.memory.add((12,23), 3, 3, (33,43), False)
 
-        self.assertEquals(self.memory.size(), 3)
+        self.assertEqual(self.memory.size(), 3)
 
         _, actions, _, _, _ = zip(*self.memory.sample(3))
         self.assertEqual(len(actions), 3)
@@ -46,7 +46,7 @@ class TestReplayMemory(unittest.TestCase):
         self.memory.add((13,23), 3, 3, (33,43), False)
         self.memory.add((14,24), 4, 4, (34,44), False)
 
-        self.assertEquals(self.memory.size(), 3)
+        self.assertEqual(self.memory.size(), 3)
 
         _, actions, _, _, _ = zip(*self.memory.sample(3))
         self.assertEqual(len(actions), 3)
@@ -62,7 +62,7 @@ class TestReplayMemory(unittest.TestCase):
         self.memory.add((15,25), 5, 5, (35,45), False)
         self.memory.add((16,26), 6, 6, (36,46), False)
 
-        self.assertEquals(self.memory.size(), 3)
+        self.assertEqual(self.memory.size(), 3)
 
         _, actions, _, _, _ = zip(*self.memory.sample(3))
         self.assertEqual(len(actions), 3)
