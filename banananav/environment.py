@@ -159,6 +159,70 @@ class BananaAgent:
         return np.random.randint(self._action_size)
 
 
+import gym
+# import matplotlib
+# print(matplotlib.rcsetup.interactive_bk)
+# print(matplotlib.rcsetup.non_interactive_bk)
+# print(matplotlib.rcsetup.all_backends)
+# matplotlib.use("MacOSX")
+# matplotlib.use("Agg")
+# from matplotlib import pyplot as plt
+# from pyvirtualdisplay import Display
+
+class TestEnv():
+    """Environment with known performance for testing purposes."""
+
+    def __init__(self):
+        # self.display = Display(visible=0, size=(1400, 900))
+        # self.display.start()
+
+        # is_ipython = 'inline' in plt.get_backend()
+        # if is_ipython:
+        #     from IPython import display
+        #
+        # plt.ion()
+
+        self.env = gym.make('LunarLander-v2')
+        self.env.seed(0)
+
+        self._score = 0
+
+    def generate_episode(self, agent, max_steps=None, train_mode=False):
+        state = self.env.reset()
+        self._score = 0
+
+        # img = plt.imshow(self.env.render(mode='rgb_array'))
+
+        cnt = 0
+        done = False
+        while not done and cnt < 1000:
+            cnt += 1
+            action = agent.act(state)
+
+            # img.set_data(self.env.render(mode='rgb_array'))
+            # plt.axis('off')
+            next_state, reward, done, _ = self.env.step(action)
+
+            step_data = (state, action, reward, next_state, done)
+
+            state = next_state
+            self._score += reward
+
+            yield step_data
+
+    def get_state_size(self):
+        return self.env.observation_space.shape[0]
+
+    def get_action_size(self):
+        return self.env.action_space.n
+
+    def get_score(self):
+        return self._score
+
+    def close(self):
+        self.env.close()
+
+
 if __name__ == '__main__':
     # Run as > PYTHONPATH=".." python environment.py
     from pprint import pprint
