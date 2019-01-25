@@ -1,6 +1,7 @@
 import pkg_resources
 
 import random
+import torch
 import numpy as np
 
 from unityagents import UnityEnvironment
@@ -32,7 +33,7 @@ class BananaEnv:
         self._info = None
         self._score = None
 
-    def generate_episode(self, agent, max_steps=None):
+    def generate_episode(self, agent, max_steps=None, train_mode=False):
         """Create a generator for and episode driven by an actor.
         Args:
             actor: An actor that provides the next action for a given state.
@@ -44,7 +45,7 @@ class BananaEnv:
             the obtained reward, the next state and a flag whether the next
             state is terminal or not.
         """
-        state = self.reset()
+        state = self.reset(train_mode=train_mode)
         is_terminal = False
         count = 0
 
@@ -143,14 +144,19 @@ class BananaAgent:
         Returns:
             An int representing the action.
         """
-        if self._epsilon == 0.0 or random.uniform(0, 1) > self._epsilon:
-            action = np.argmax(self._Q(state))
+        if not torch.is_tensor(state):
             try:
-                return action.item()
+                state = torch.from_numpy(state)
             except:
-                return action
+                state = torch.from_numpy(np.array(state, dtype=np.float))
 
-        return random.randint(0, self._action_size)
+        state = state.float()
+
+        if self._epsilon == 0.0 or random.uniform(0, 1) > self._epsilon:
+            with torch.no_grad():
+                return torch.argmax(self._Q(state)).item()
+
+        return np.random.randint(self._action_size)
 
 
 if __name__ == '__main__':
@@ -176,7 +182,7 @@ if __name__ == '__main__':
     env.terminate()
 
     print("\n\n\nRun episode:")
-    rand_Q = lambda s: np.random.rand(4)
+    rand_Q = lambda s: torch.rand(4)
     agent = BananaAgent(rand_Q, 4)
     episode = enumerate(env.generate_episode(agent, max_steps=5))
     for count, step_data in episode:
