@@ -1,10 +1,10 @@
 import pkg_resources
-
 import random
 import torch
 import numpy as np
 
 from unityagents import UnityEnvironment
+from unityagents.exception import UnityEnvironmentException
 
 PLATFORM_PATHS = ['Banana.app', 'Banana_Linux', 'Banana_Windows_x86', 'Banana_Windows_x86_64']
 
@@ -19,8 +19,12 @@ class BananaEnv:
             try:
                 unity_resource = pkg_resources.resource_filename('banananav', 'resources/' + path)
                 self._env = UnityEnvironment(file_name=unity_resource)
+                print("Environment loaded from " + path)
                 break
-            except:
+            except UnityEnvironmentException as e:
+                print("Attempted to load " + path + ":")
+                print(e)
+                print("")
                 pass
 
         if not hasattr(self, '_env'):
@@ -248,7 +252,7 @@ if __name__ == '__main__':
     print("\n\n\nRun episode:")
     rand_Q = lambda s: torch.rand(4)
     agent = BananaAgent(rand_Q, 4)
-    episode = enumerate(env.generate_episode(agent, max_steps=5))
+    episode = enumerate(env.generate_episode(agent))
     for count, step_data in episode:
         print("\n\nCount:")
         pprint(count)
