@@ -11,8 +11,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class DeepQLearner():
     def __init__(self, env=None, model=BananaQModel, memory=ReplayMemory(int(5e4)),
-            batch_steps=4, batch_size=64,
-            lr=5e-4, decay=0.001,
+            batch_steps=4, batch_size=32, batch_repeat=8,
+            lr=1e-4, decay=0.001,
             epsilon_start=1.0, epsilon_min=0.01, epsilon_decay=0.995,
             gamma=0.99, tau=1e-3):
         self._memory = memory
@@ -25,6 +25,7 @@ class DeepQLearner():
         # self._seed = random.seed(seed)
         self._batch_steps = batch_steps
         self._batch_size = batch_size
+        self._batch_repeat = batch_repeat
 
         self._epsilon_start=epsilon_start
         self._epsilon_min=epsilon_min
@@ -62,8 +63,9 @@ class DeepQLearner():
 
             if (step % self._batch_steps == 0 or self._is_terminal(step_data)) \
                     and self._memory.size() >= self._batch_size:
-                loss = self._train_from_memory()
-                self._update_target()
+                for i in range(1 if self._memory.size() < 1000 else self._batch_repeat):
+                    loss = self._train_from_memory()
+                    self._update_target()
                 yield loss, self._env.get_score(), self._is_terminal(step_data)
 
     def _get_epsilon(self, cnt):
