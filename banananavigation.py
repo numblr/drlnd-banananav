@@ -1,18 +1,35 @@
 from pprint import pprint
-import numpy as np
-from collections import deque
 
 from banananav.environment import BananaEnv, BananaAgent, TestEnv
 from banananav.training import DeepQLearner
 from banananav.replaymemory import ReplayMemory
+from banananav.util import print_progress, plot
+
 
 learner = DeepQLearner()
-scores_window = deque(maxlen=100)
-for cnt, data in enumerate(learner.train(200)):
+
+scores = ()
+losses = ()
+
+episode_cnt = 0
+episode_step = 0
+for cnt, data in enumerate(learner.train(1500)):
+    episode_step += 1
     loss, score, terminal = data
+
     if terminal:
-        scores_window.append(score)
-        pprint("{} - loss: {:+.3f} / score: {:+.3f}({:+.3f})".format(cnt, loss, np.mean(scores_window), score))
+        scores += (score, )
+        losses += (loss.item(), )
+        episode_cnt += 1
+        episode_step = 0
+
+    print_progress(episode_cnt, episode_step, loss, scores)
+    if terminal:
+        print("")
+
+plot(scores)
+plot(losses)
+
 
 env = BananaEnv()
 episode = env.generate_episode(learner.get_agent())
