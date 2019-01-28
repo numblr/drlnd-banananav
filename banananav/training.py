@@ -36,6 +36,15 @@ class DeepQLearner():
         self._qnetwork_target = model(self._state_size, self._actions).to(device)
         self._optimizer = optim.Adam(self._qnetwork_local.parameters(), lr=lr)
 
+    def save(self, path):
+        torch.save(self._qnetwork_local.state_dict(), path)
+
+    def load(self, path):
+        self._qnetwork_local.load_state_dict(torch.load(path))
+        self._qnetwork_target.load_state_dict(torch.load(path))
+        self._qnetwork_local.to(device)
+        self._qnetwork_target.to(device)
+
     def get_agent(self, epsilon=0.0):
         return BananaAgent(self._qnetwork_local, self._env.get_action_size(),
                 epsilon=epsilon)
