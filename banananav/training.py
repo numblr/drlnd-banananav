@@ -10,7 +10,7 @@ from banananav.replaymemory import ReplayMemory
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class DeepQLearner():
-    def __init__(self, env=None, memory=ReplayMemory(int(1e5)),
+    def __init__(self, env=None, model=BananaQModel, memory=ReplayMemory(int(5e4)),
             batch_steps=4, batch_size=64,
             lr=5e-4, decay=0.001,
             epsilon_start=1.0, epsilon_min=0.01, epsilon_decay=0.995,
@@ -32,8 +32,8 @@ class DeepQLearner():
         self._gamma = gamma
         self._tau = tau
 
-        self._qnetwork_local = BananaQModel(self._state_size, self._actions).to(device)
-        self._qnetwork_target = BananaQModel(self._state_size, self._actions).to(device)
+        self._qnetwork_local = model(self._state_size, self._actions).to(device)
+        self._qnetwork_target = model(self._state_size, self._actions).to(device)
         self._optimizer = optim.Adam(self._qnetwork_local.parameters(), lr=lr)
 
     def get_agent(self, epsilon=0.0):
