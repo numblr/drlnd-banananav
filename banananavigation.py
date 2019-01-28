@@ -6,7 +6,9 @@ from banananav.replaymemory import ReplayMemory
 from banananav.util import print_progress, plot
 
 
-learner = DeepQLearner()
+env=BananaEnv()
+learner = DeepQLearner(env=env)
+
 
 scores = ()
 losses = ()
@@ -31,7 +33,6 @@ plot(scores)
 plot(losses)
 
 
-env = BananaEnv()
 episode = env.generate_episode(learner.get_agent())
 for count, step_data in enumerate(episode):
     pprint("step: " + str(count))
