@@ -10,8 +10,8 @@ from banananav.replaymemory import ReplayMemory
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class DeepQLearner():
-    def __init__(self, env=None, model=BananaQModel, memory=ReplayMemory(int(5e4)),
-            batch_steps=4, batch_size=32, batch_repeat=8,
+    def __init__(self, env=None, model=BananaQModel, memory=ReplayMemory(int(3e4)),
+            batch_steps=4, batch_size=64, batch_repeat=4,
             lr=1e-4, decay=0.001,
             epsilon_start=1.0, epsilon_min=0.01, epsilon_decay=0.995,
             gamma=0.99, tau=1e-3):

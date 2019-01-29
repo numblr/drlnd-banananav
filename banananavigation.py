@@ -21,7 +21,7 @@ losses = ()
 episode_cnt = 0
 episode_step = 0
 max_avg_score = 0.0
-for cnt, data in enumerate(learner.train(1000)):
+for cnt, data in enumerate(learner.train(1800)):
     episode_step += 1
     loss, score, terminal = data
 
