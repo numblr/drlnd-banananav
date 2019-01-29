@@ -35,7 +35,8 @@ class DeepQLearner():
 
         self._qnetwork_local = model(self._state_size, self._actions).to(device)
         self._qnetwork_target = model(self._state_size, self._actions).to(device)
-        self._optimizer = optim.Adam(self._qnetwork_local.parameters(), lr=lr)
+        self._optimizer = optim.Adam(self._qnetwork_local.parameters(), lr=lr,
+            amsgrad=True)
 
     def save(self, path):
         torch.save(self._qnetwork_local.state_dict(), path)
