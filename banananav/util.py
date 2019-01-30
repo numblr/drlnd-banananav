@@ -7,7 +7,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 
 
-def print_progress(count, step, loss, scores, total=76, bar_len = 60, status=''):
+def print_progress(count, step, loss, scores, total=76, bar_len = 60):
     if count == 0:
         return
 
@@ -26,11 +26,27 @@ def print_progress(count, step, loss, scores, total=76, bar_len = 60, status='')
     sys.stdout.flush()
 
 
-def plot(data):
-    plt.plot(range(len(data)), data, c='b')
-    plt.plot(range(len(data)), [ _mean(data, i, 10) for i in range(len(data)) ], c='g')
-    plt.plot(range(len(data)), [ _mean(data, i, 100) for i in range(len(data)) ], c='r')
-    plt.show()
+def plot(data, windows=[1,10,100], path="", colors=['r', 'g', 'c'], labels=["1", "10", "100"]):
+    if path is not None and path != "":
+        start_plot()
+
+    for window, color, label in zip(windows, colors, labels):
+        plt.plot(range(len(data)), [ _mean(data, i, window) for i in range(len(data)) ],
+                c=color, label=label)
+
+    if path is None:
+        return
+    elif path == "":
+        plt.show()
+    else:
+        save_plot(path)
+
+def start_plot():
+    plt.figure()
+
+def save_plot(path):
+    plt.legend(loc='upper left')
+    plt.savefig(path)
 
 
 def _mean(data, i, window):
