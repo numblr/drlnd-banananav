@@ -3,7 +3,7 @@ from pprint import pprint
 import numpy as np
 
 from banananav.environment import BananaEnv, BananaAgent, TestEnv
-from banananav.training import DeepQLearner
+from banananav.training import DeepQLearner, DoubleDeepQLearner
 from banananav.replaymemory import ReplayMemory
 from banananav.util import print_progress, plot
 
@@ -12,7 +12,7 @@ path = "results/model.parameters"
 
 
 env=BananaEnv()
-learner = DeepQLearner(env=env)
+learner = DoubleDeepQLearner(env=env)
 
 
 scores = ()

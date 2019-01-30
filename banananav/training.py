@@ -38,6 +38,9 @@ class DeepQLearner():
         self._optimizer = optim.Adam(self._qnetwork_local.parameters(), lr=lr,
             amsgrad=True)
 
+        self._qnetwork_local.eval()
+        self._qnetwork_target.eval()
+
     def save(self, path):
         torch.save(self._qnetwork_local.state_dict(), path)
 
@@ -73,25 +76,10 @@ class DeepQLearner():
         return max(self._epsilon_min, self._epsilon_decay ** cnt * self._epsilon_start)
 
     def _train_from_memory(self):
-        states, actions, rewards, next_states, is_terminal = \
-                tuple(zip(*self._memory.sample(self._batch_size)))
-
-        states, next_states, rewards, is_terminal = self._to_tensor(states, next_states, rewards, is_terminal)
-        actions = self._to_tensor(actions, dtype=torch.long)[0]
-
-        rewards = rewards.unsqueeze(1)
-        is_terminal = is_terminal.unsqueeze(1)
-        actions = actions.unsqueeze(1)
-
         self._qnetwork_local.train()
 
-        # Q_target_next = self._qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
-        Q_target_choices = self._qnetwork_local(next_states).max(1)[1].unsqueeze(1)
-        Q_target_next = self._qnetwork_target(next_states).detach().gather(1, Q_target_choices)
-        Q_target = rewards + (self._gamma * Q_target_next * (1 - is_terminal))
-        Q_predicted = self._qnetwork_local(states).gather(1, actions)
-
-        loss = F.mse_loss(Q_target, Q_predicted)
+        batch = self._memory.sample(self._batch_size)
+        loss = self._calculate_loss(*zip(*batch))
 
         self._optimizer.zero_grad()
         loss.backward()
@@ -99,9 +87,24 @@ class DeepQLearner():
 
         self._qnetwork_local.eval()
 
-        # Validate the calculations
-        assert Q_target_choices.size() == actions.size()
-        assert Q_predicted.size()[0] == self._batch_size
+        return loss
+
+    def _calculate_loss(self, states, actions, rewards, next_states, is_terminal):
+        states, next_states, rewards, is_terminal = self._to_tensor(states, next_states, rewards, is_terminal)
+        actions = self._to_tensor(actions, dtype=torch.long)[0]
+
+        rewards = rewards.unsqueeze(1)
+        is_terminal = is_terminal.unsqueeze(1)
+        actions = actions.unsqueeze(1)
+
+        Q_target_next = self._qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
+        Q_target = rewards + (self._gamma * Q_target_next * (1 - is_terminal))
+        Q_predicted = self._qnetwork_local(states).gather(1, actions)
+
+        loss = F.mse_loss(Q_target, Q_predicted)
+
+        # Validate dimensions
+        assert Q_predicted.size()[0] == states.size()[0]
         assert Q_predicted.size()[1] == 1
         assert Q_predicted.size() == Q_target_next.size() == Q_target.size() \
                 == rewards.size() == is_terminal.size() == actions.size()
@@ -126,3 +129,40 @@ class DeepQLearner():
 
     def _to_tensor(self, *arrays, dtype=torch.float):
         return tuple(torch.tensor(a).to(device, dtype=dtype) for a in arrays)
+
+
+class DoubleDeepQLearner(DeepQLearner):
+    def __init__(self, env=None, model=BananaQModel, memory=ReplayMemory(int(3e4)),
+            batch_steps=4, batch_size=64, batch_repeat=4,
+            lr=1e-4, decay=0.001,
+            epsilon_start=1.0, epsilon_min=0.01, epsilon_decay=0.995,
+            gamma=0.99, tau=1e-3):
+        super(DoubleDeepQLearner, self).__init__(env=env, model=model, memory=memory,
+                batch_steps=batch_steps, batch_size=batch_size, batch_repeat=batch_repeat,
+                lr=lr, decay=decay,
+                epsilon_start=epsilon_start, epsilon_min=epsilon_min, epsilon_decay=epsilon_decay,
+                gamma=gamma, tau=tau)
+
+    def _calculate_loss(self, states, actions, rewards, next_states, is_terminal):
+        states, next_states, rewards, is_terminal = self._to_tensor(states, next_states, rewards, is_terminal)
+        actions = self._to_tensor(actions, dtype=torch.long)[0]
+
+        rewards = rewards.unsqueeze(1)
+        is_terminal = is_terminal.unsqueeze(1)
+        actions = actions.unsqueeze(1)
+
+        Q_local_next_choices = self._qnetwork_local(next_states).max(1)[1].unsqueeze(1)
+        Q_target_next = self._qnetwork_target(next_states).detach().gather(1, Q_local_next_choices)
+        Q_target = rewards + (self._gamma * Q_target_next * (1 - is_terminal))
+        Q_predicted = self._qnetwork_local(states).gather(1, actions)
+
+        loss = F.mse_loss(Q_target, Q_predicted)
+
+        # Validate dimensions
+        assert Q_local_next_choices.size() == actions.size()
+        assert Q_predicted.size()[0] == states.size()[0]
+        assert Q_predicted.size()[1] == 1
+        assert Q_predicted.size() == Q_target_next.size() == Q_target.size() \
+                == rewards.size() == is_terminal.size() == actions.size()
+
+        return loss
