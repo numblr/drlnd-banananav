@@ -85,7 +85,9 @@ class DeepQLearner():
 
         self._qnetwork_local.train()
 
-        Q_target_next = self._qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
+        # Q_target_next = self._qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
+        Q_target_choices = self._qnetwork_local(next_states).max(1)[1].unsqueeze(1)
+        Q_target_next = self._qnetwork_target(next_states).detach().gather(1, Q_target_choices)
         Q_target = rewards + (self._gamma * Q_target_next * (1 - is_terminal))
         Q_predicted = self._qnetwork_local(states).gather(1, actions)
 
@@ -98,6 +100,7 @@ class DeepQLearner():
         self._qnetwork_local.eval()
 
         # Validate the calculations
+        assert Q_target_choices.size() == actions.size()
         assert Q_predicted.size()[0] == self._batch_size
         assert Q_predicted.size()[1] == 1
         assert Q_predicted.size() == Q_target_next.size() == Q_target.size() \
