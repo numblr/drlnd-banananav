@@ -1,5 +1,4 @@
 import torch
-from torch import nn
 from torch import optim
 import torch.nn.functional as F
 
@@ -10,6 +9,9 @@ from banananav.replaymemory import ReplayMemory
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class DeepQLearner():
+    """Implementation of the DQN learning algorithm with experience replay.
+    """
+
     def __init__(self, env=None, model=BananaQModel, memory=ReplayMemory(int(3e4)),
             batch_steps=4, batch_size=64, batch_repeat=4,
             lr=1e-4, decay=0.001,
@@ -22,7 +24,6 @@ class DeepQLearner():
         self._state_size = self._env.get_state_size()
         self._actions = self._env.get_action_size()
 
-        # self._seed = random.seed(seed)
         self._batch_steps = batch_steps
         self._batch_size = batch_size
         self._batch_repeat = batch_repeat
@@ -42,15 +43,26 @@ class DeepQLearner():
         self._qnetwork_target.eval()
 
     def save(self, path):
+        """Store the learning result.
+
+        Store the parameters of the current Q-function approximation to the given path.
+        """
         torch.save(self._qnetwork_local.state_dict(), path)
 
     def load(self, path):
+        """Load learning results.
+
+        Load the parameters from the given path into the current and target
+        Q-function approximator.
+        """
         self._qnetwork_local.load_state_dict(torch.load(path))
         self._qnetwork_target.load_state_dict(torch.load(path))
         self._qnetwork_local.to(device)
         self._qnetwork_target.to(device)
 
     def get_agent(self, epsilon=0.0):
+        """Return an agent based on the parameters of the current Q-function approximation.
+        """
         return BananaAgent(self._qnetwork_local, self._env.get_action_size(),
                 epsilon=epsilon)
 
@@ -132,6 +144,9 @@ class DeepQLearner():
 
 
 class DoubleDeepQLearner(DeepQLearner):
+    """Implementation of the Double-DQN learning algorithm with experience replay.
+    """
+
     def __init__(self, env=None, model=BananaQModel, memory=ReplayMemory(int(3e4)),
             batch_steps=4, batch_size=64, batch_repeat=4,
             lr=1e-4, decay=0.001,

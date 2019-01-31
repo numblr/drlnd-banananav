@@ -104,9 +104,8 @@ def replay(env, settings):
     replay_agent = learner.get_agent()
     episode = env.generate_episode(replay_agent)
     for count, step_data in enumerate(episode):
-        print("step: " + str(count))
-        print("score: " + str(env.get_score()))
-        print("=====================")
+        print("=== step: " + str(count))
+        print("score:    " + str(env.get_score()))
 
 def learn(env, settings, episodes):
     print("\nStart learning with " + settings.label + "\n")
@@ -154,5 +153,5 @@ if __name__ == '__main__':
 
         start_plot()
         for scores, losses, label, color in results:
-            plot(scores, windows=[1], colors=[color], labels=[label], path=None)
+            plot(scores, windows=[100], colors=[color], labels=[label], path=None)
         save_plot(MULTI_SCORES_PATH)

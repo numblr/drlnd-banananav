@@ -27,6 +27,7 @@ def print_progress(count, step, loss, scores, total=76, bar_len = 60):
 
 
 def plot(data, windows=[1,10,100], path="", colors=['r', 'g', 'c'], labels=["1", "10", "100"]):
+    """Plot the provided array with running averages with the given window sizes."""
     if path is not None and path != "":
         start_plot()
 
@@ -47,7 +48,6 @@ def start_plot():
 def save_plot(path):
     plt.legend(loc='upper left')
     plt.savefig(path)
-
 
 def _mean(data, i, window):
     return np.mean(data[i-window:i]) if i > window else 0.0
