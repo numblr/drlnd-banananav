@@ -74,14 +74,17 @@ def run_learner(learner, result_path, episodes=750, checkpoint_window=33):
 
     episode_cnt = 0
     episode_step = 0
+    episode_losses = ()
     max_avg_score = 0.0
     for cnt, data in enumerate(learner.train(episodes)):
         episode_step += 1
         loss, score, terminal = data
+        episode_losses += (loss.item(), )
 
         if terminal:
             scores += (score, )
-            losses += (loss.item(), )
+            losses += (np.mean(episode_losses), )
+            episode_losses = ()
             episode_cnt += 1
             episode_step = 0
 
