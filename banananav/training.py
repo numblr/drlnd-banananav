@@ -42,6 +42,9 @@ class DeepQLearner():
         self._qnetwork_local.eval()
         self._qnetwork_target.eval()
 
+        print("Initialize DeepQLearner with model:")
+        print(self._qnetwork_local)
+
     def save(self, path):
         """Store the learning result.
 
@@ -157,6 +160,9 @@ class DoubleDeepQLearner(DeepQLearner):
                 lr=lr, decay=decay,
                 epsilon_start=epsilon_start, epsilon_min=epsilon_min, epsilon_decay=epsilon_decay,
                 gamma=gamma, tau=tau)
+
+        print("Initialize DoubleDeepQLearner")
+
 
     def _calculate_loss(self, states, actions, rewards, next_states, is_terminal):
         states, next_states, rewards, is_terminal = self._to_tensor(states, next_states, rewards, is_terminal)

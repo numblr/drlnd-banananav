@@ -45,8 +45,8 @@ def plot(data, windows=[1,10,100], path="", colors=['r', 'g', 'c'], labels=["1",
 def start_plot():
     plt.figure()
 
-def save_plot(path):
-    plt.legend(loc='upper left')
+def save_plot(path, loc='upper left'):
+    plt.legend(loc=loc)
     plt.savefig(path)
 
 def _mean(data, i, window):

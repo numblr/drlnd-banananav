@@ -154,4 +154,4 @@ if __name__ == '__main__':
         start_plot()
         for scores, losses, label, color in results:
             plot(scores, windows=[100], colors=[color], labels=[label], path=None)
-        save_plot(MULTI_SCORES_PATH)
+        save_plot(MULTI_SCORES_PATH, loc='lower right')
