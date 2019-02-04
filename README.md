@@ -87,3 +87,9 @@ to execute learning and
 > python banananavigation.py --replay
 ```
 When invoked without command line parameters, the script will execute learning for all algorithm + network architecture combinations on 2500 episodes each. For help on the possible command line options execute the script with the --help option.
+
+### Results
+
+Results of training the different algorithm and models can be found in the *results/* directory. In particular the *results/xxx_model.parameters* files contain the trained parameters of the different models.
+
+The included results achieve the target of an average score of +13 in less than 600 episodes and reach a top average score of +17.4.
