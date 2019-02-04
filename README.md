@@ -92,4 +92,4 @@ When invoked without command line parameters, the script will execute learning f
 
 Results of training the different algorithm and models can be found in the *results/* directory. In particular the *results/xxx_model.parameters* files contain the trained parameters of the different models.
 
-The included results achieve the target of an average score of +13 in less than 600 episodes and reach a top average score of +17.4.
+The included results achieve the target of an average score of +13 in less than 600 episodes and reach a top average score of +17.4. The parameters for the model with the best result are also stored in the *ddqn_model.parameters.pt* file in the root of the repository.
