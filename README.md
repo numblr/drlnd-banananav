@@ -6,12 +6,12 @@
 
 ### Introduction
 
-This project implements an agent to navigate (and collect bananas!) in a large, square world.  
+This project is taken from the [Udacity DRLND nano degree program](https://github.com/udacity/deep-reinforcement-learning/tree/master/p1_navigation) and implements an agent to navigate (and collect bananas!) in a large, square world.  
 
 ![Trained Agent][image1]
 ([source](https://user-images.githubusercontent.com/10624937/42135619-d90f2f28-7d12-11e8-8823-82b970a54d7e.gif))
 
-#### General setting
+#### General setting (see also the original [repo](https://github.com/udacity/deep-reinforcement-learning/tree/master/p1_navigation))
 
 The agent navigates in a predefined [*Unity* environment](https://github.com/Unity-Technologies/ml-agents) that represents a square world were it has to collect bananas. A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana.  Thus, the goal of your agent is to collect as many yellow bananas as possible while avoiding blue bananas.  
 
@@ -35,7 +35,7 @@ In addition to this algorithm variants two different architectures of DNNs as fu
 
 The implementation can execute learning and compare a selection of combinations of algorithm variant and network architecture. Once the agent is trained it can replay an episode of using the parameters stored after learning. A discussion of the results can be found in `Report.ipynb` (or `Report.html` respectively). For a description on how to run the program see the [Instructions](#instructions) section below.
 
-### Getting started
+### Getting started (see also the original [repo](https://github.com/udacity/deep-reinforcement-learning/tree/master/p1_navigation))
 
 To set up your python environment to run the code in this repository, follow this steps:
 
